@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard E-commerce</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Icônes (pour fas fa-*) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-3hHS3pM2c0sJf0zqH7wN2x2n8o1U6e4s8bG+9zY2o+8y8slw5Jb8g1t4o7tM2zjY3yT7vEItmrxu7p3e5wJ7yQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Tes assets -->
+  <script defer src="{{ url_for('static', filename='dashboard.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles_dashboard.css') }}" />
+</head>
+
+<body>
+  <!-- Overlay de chargement -->
+  <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+    <div class="spinner" role="status" aria-label="Chargement en cours"></div>
+  </div>
+
+  <!-- En-tête -->
+  <header class="wrap" role="banner" aria-label="En-tête du dashboard">
+    <div class="grid" style="align-items:center; grid-template-columns: 1fr auto;">
+      <div>
+        <h1 style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <i class="fas fa-chart-line" aria-hidden="true"></i>
+          <span>Dashboard E-commerce</span>
+        </h1>
+        <p style="margin:0; color: var(--muted);">Analyse en temps réel des performances &amp; KPIs</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" type="button" onclick="exportData()" aria-label="Exporter les données">
+          <i class="fas fa-download" aria-hidden="true"></i>
+          <span>Exporter</span>
+        </button>
+        <button class="btn btn-primary" type="button" onclick="refreshData()" aria-label="Actualiser les données">
+          <i class="fas fa-sync-alt" aria-hidden="true"></i>
+          <span>Actualiser</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenu principal -->
+  <main class="wrap" role="main">
+    <!-- KPIs -->
+    <section aria-labelledby="kpi-title">
+      <h2 id="kpi-title" style="position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;">
+        Indicateurs clés (KPIs)
+      </h2>
+
+      <div class="grid">
+        <article class="card" aria-label="Chiffre d'affaires total">
+          <div class="KPI">CA total</div>
+          <!-- <div class="kpi-trend"><i class="fas fa-arrow-up"></i> {{template.evolution_ca}}</div> -->
+          <div class="val">{{ template.ca_total | default('—') }}</div>
+        </article>
+
+        <article class="card" aria-label="Chiffre d'affaires moyen par client">
+          <div class="KPI">CA moyen / client</div>
+          <div class="val">{{ template.ca_moyen | default('—') }}</div>
+        </article>
+
+        <article class="card" aria-label="Nombre de Client Actifs">
+          <div class="KPI">Clients Actifs</div>
+          <div class="val">{{template.nb_clients | default('—')}}</div>
+        </article>
+
+        <article class="card" aria-label="Nombre de Client Actifs">
+          <div class="KPI">Life Time Value</div>
+          <div class="val">{{template.ltv_moyenne | default('—')}}</div>
+        </article>
+
+        <article class="card" aria-label="Écart-type du chiffre d'affaires">
+          <div class="KPI">Écart-type CA</div>
+          <div class="val">{{ template.ca_std | default('—') }}</div>
+        </article>
+
+        <article class="card" aria-label="YAS moyenne">
+          <div class="KPI">YAS (moy.)</div>
+          <div class="val">{{ template.yas_mean | default('—') }}</div>
+        </article>
+
+        <article class="card" aria-label="YAS médiane">
+          <div class="KPI">YAS (méd.)</div>
+          <div class="val">{{ template.yas_median | default('—') }}</div>
+        </article>
+
+        <article class="card" aria-label="YAS écart-type">
+          <div class="KPI">YAS</div>
+          <div class="val">{{ template.yas_std | default('—') }}</div>
+        </article>
+
+        <article class="card" aria-label="Panier moyen">
+          <div class="KPI">Panier (moy.)</div>
+          <div class="val">{{ template.panier_mean | default('—') }}</div>
+        </article>
+
+        <article class="card" aria-label="Sessions moyennes">
+          <div class="KPI">Sessions (moy.)</div>
+          <div class="val">{{ template.sessions_mean | default('—') }}</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Graphiques -->
+    <section class="section grid" aria-labelledby="charts-title">
+      <h2 id="charts-title" style="position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;">
+        Graphiques
+      </h2>
+
+      <figure class="chartbox" style="grid-column: span 2;" aria-label="Rétention des clients">
+        <figcaption style="margin-bottom:10px;">Rétention des Clients</figcaption>
+        <canvas id="segCounts" aria-label="Graphique de rétention des clients" role="img"></canvas>
+      </figure>
+
+      <figure class="chartbox" style="grid-column: span 2;" aria-label="CA moyen par ancienneté">
+        <figcaption style="margin-bottom:10px;">CA moyen par Ancienneté</figcaption>
+        <canvas id="segCA" aria-label="Graphique du CA moyen par ancienneté" role="img"></canvas>
+      </figure>
+    </section>
+  </main>
+
+ <script>
+  window.DASHBOARD_DATA = {
+    segLabels: {{ (segment_labels | default([], true)) | tojson }},
+    segCounts: {{ (segment_values | default([], true)) | tojson }},
+    segCAMoyen: {{ (segment_ca_moyen | default([], true)) | tojson }}
+  };
+</script>
+
+</body>
+
+</html>
