@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 import pandas as pd
 import numpy as np
-
+from analyse import analyse_all, graphique_top_clients
 app = Flask(__name__, static_folder='Static')
 
 df = pd.read_csv("Ecommerce_Customers.csv")
@@ -84,12 +84,18 @@ segment_ca_moyen = [round(float(v), 2) for v in ca_par_segment['CA moyen'].value
 
 @app.route("/")
 def index():
+    
     return render_template(
         "dashboard.html",
         template=template,
         segment_labels=segment_labels,
         segment_values=segment_values,
         segment_ca_moyen=segment_ca_moyen
+        tableaux = analysis["tableaux"],
+        top_clients_labels = top_clients_labels,
+        top_clients_values = top_clients_values,
+        other_labels=[],
+        other_values=[]
     )
 
 if __name__ == "__main__":
