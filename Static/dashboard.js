@@ -71,6 +71,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const ctxPie = document.getElementById('segmentPieChart');
+  console.log("Camembert lancé", segmentLabels, segmentCA);
+  if (ctxPie) {
+    new Chart(ctxPie, {
+      type: 'pie',
+      data: {
+        labels: segmentLabels,
+        datasets: [{
+          label: 'CA total (€)',
+          data: segmentCA,
+          backgroundColor: ['#3D1FE6', '#1A0D99', '#6C5CE7', '#A29BFE'],
+          borderColor: '#ffffff',
+          borderWidth: 0.5
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: '#ffffffff',
+              font: { size: 14 }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                return `${label}: ${value.toFixed(2)} €`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 
 });
 function refreshData() {

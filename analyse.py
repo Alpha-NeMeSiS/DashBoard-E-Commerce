@@ -28,7 +28,7 @@ def graphique_top_clients(tableaux):
     top_clients = tableaux.get('top_clients', [])
     labels = [client['Email'] for client in top_clients]
     values = [round(client['Yearly Amount Spent'], 2) for client in top_clients]
-    return labels, values
+    return labels, values   
 
 def analyse_all():
     data = pd.read_csv("Ecommerce_Customers.csv")

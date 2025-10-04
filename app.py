@@ -46,9 +46,11 @@ df['Segment_Anciennete'] = pd.cut(
 segment_counts = df['Segment_Anciennete'].value_counts().sort_index()
 ca_par_segment = (
     df.groupby('Segment_Anciennete', observed=False)['Yearly Amount Spent']
-      .agg(['mean', 'median', 'count'])
-      .rename(columns={'mean': 'CA moyen', 'median': 'CA médian', 'count': 'Nb clients'})
+      .agg(['sum', 'mean', 'count'])
+      .rename(columns={'sum': 'CA total', 'mean': 'CA moyen', 'count': 'Nb clients'})
 )
+
+segment_ca_total = [round(float(v), 2) for v in ca_par_segment['CA total'].values]
 
 # df['Length of Membership'] = pd.to_datetime(df['Length of Membership'])
  
@@ -102,8 +104,9 @@ def index():
         tableaux = analysis["tableaux"],
         top_clients_labels = top_clients_labels,
         top_clients_values = top_clients_values,
+        segment_ca_total = segment_ca_total,
         other_labels=[],
-        other_values=[]
+        other_values=[],
     )
 
 if __name__ == "__main__":

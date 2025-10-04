@@ -133,6 +133,11 @@
         </div>
       </figure>
 
+      <figure class="chartbox" style="grid-column: 2 / span 2;" aria-label="Répartition des segments">
+        <figcaption>Répartition des revenus par fidélisation</figcaption>
+        <canvas id="segmentPieChart"></canvas>
+      </figure>
+
     </section>
   </main>
 
@@ -141,6 +146,8 @@
     const topClientsValues = {{ top_clients_values | default([]) | tojson }};
     const otherLabels = {{ other_labels | default([]) | tojson }};
     const otherValues = {{ other_values | default([]) | tojson }};
+    const segmentLabels = {{ segment_labels | default([]) | tojson }};
+    const segmentCA = {{ segment_ca_total | default([]) | tojson }};
   </script>
 
 </body>
