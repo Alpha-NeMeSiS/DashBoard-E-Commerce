@@ -125,16 +125,27 @@
         <figcaption style="margin-bottom:10px;">CA moyen par Ancienneté</figcaption>
         <canvas id="segCA" aria-label="Graphique du CA moyen par ancienneté" role="img"></canvas>
       </figure>
+
+      <figure class="chartbox" style="grid-column: span 2;" aria-label="Top clients par montant">
+        <figcaption style="margin-bottom:10px;">Top clients (montant dépensé)</figcaption>
+        <canvas id="tableaux_Kpi" aria-label="Graphique top clients" role="img"></canvas>
+      </figure>
+
     </section>
   </main>
 
- <script>
-  window.DASHBOARD_DATA = {
-    segLabels: {{ (segment_labels | default([], true)) | tojson }},
-    segCounts: {{ (segment_values | default([], true)) | tojson }},
-    segCAMoyen: {{ (segment_ca_moyen | default([], true)) | tojson }}
+  <script>
+    window.DASHBOARD_DATA = {
+    segLabels: {{ (segment_labels | default ([], true)) | tojson }},
+    segCounts: {{ (segment_values | default ([], true)) | tojson }},
+    segCAMoyen: {{ (segment_ca_moyen | default ([], true)) | tojson }}
   };
-</script>
+    const topClientsLabels = {{ (top_clients_labels | default ([], true)) | tojson }};
+    const topClientsValues = {{ (top_clients_values | default ([], true)) | tojson }};
+    const otherLabels = {{ (other_labels | default ([], true)) | tojson }};
+    const otherValues = {{ (other_values | default ([], true)) | tojson }};
+  </script>
+
 
 </body>
 
