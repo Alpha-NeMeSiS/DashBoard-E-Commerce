@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 import pandas as pd
 import numpy as np
-from analyse import analyse_all, graphique_top_clients,template,segment_labels,segment_values,segment_ca_moyen
+from analyse import analyse_all, graphique_top_clients,template,segment_labels,segment_values,segment_ca_moyen,segment_ca_total
 
 app = Flask(__name__, static_folder='Static')
 
@@ -25,7 +25,8 @@ def index():
         top_clients_labels = top_clients_labels,
         top_clients_values = top_clients_values,
         other_labels=[],
-        other_values=[]
+        other_values=[],
+        segment_ca_total = segment_ca_total,
     )
 
 if __name__ == "__main__":

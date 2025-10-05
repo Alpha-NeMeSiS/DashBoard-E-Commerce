@@ -42,9 +42,12 @@ df['Segment_Anciennete'] = pd.cut(
 segment_counts = df['Segment_Anciennete'].value_counts().sort_index()
 ca_par_segment = (
     df.groupby('Segment_Anciennete', observed=False)['Yearly Amount Spent']
-      .agg(['mean', 'median', 'count'])
-      .rename(columns={'mean': 'CA moyen', 'median': 'CA médian', 'count': 'Nb clients'})
+      .agg(['sum', 'mean', 'count'])
+      .rename(columns={'sum': 'CA total', 'mean': 'CA moyen', 'count': 'Nb clients'})
 )
+
+segment_ca_total = [round(float(v), 2) for v in ca_par_segment['CA total'].values]
+
 
 # df['Length of Membership'] = pd.to_datetime(df['Length of Membership'])
  
@@ -53,7 +56,7 @@ ca_par_segment = (
  
 # evolution_ca = ((ca_actuel - ca_precedent) / ca_precedent) * 100 if ca_precedent != 0 else 0
 
-ltv_value = float(df['Yearly Amount Spent'].mean() *df['Length of Membership'].mean())
+ltv_value = float(df['Yearly Amount Spent'].mean() * df['Length of Membership'].mean())
 
 # Structures passées au template
 template = {
@@ -72,7 +75,12 @@ template = {
     "panier_median":   f"{panier_moyen_median:.2f} €",
     "sessions_mean":   f"{sessions_mean:.2f}",
     "sessions_median": f"{sessions_median:.2f}",
-    "missing_any":     "Oui" if missing_any else "Non"
+    "missing_any":     "Oui" if missing_any else "Non",
+    'anciennete_moyenne': float(df['Length of Membership'].mean()),
+    'panier_moyen': float((df['Yearly Amount Spent'] /((df['Time on App'] + df['Time on Website']) /df['Avg. Session Length'])).mean()),
+    'taux_retention_1an': float((df['Length of Membership'] > 1).sum() / len(df) * 100),
+    'taux_retention_3ans': float((df['Length of Membership'] > 3).sum() / len(df) * 100),
+
 }
 
 segment_labels   = list(segment_counts.index.astype(str))

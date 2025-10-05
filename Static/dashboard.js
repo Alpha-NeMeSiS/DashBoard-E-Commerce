@@ -10,7 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
         labels: segLabels,
         datasets: [{ label: 'Nb clients', data: segCounts }]
       },
-      options: { responsive: true, plugins: { legend: { display: false } } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        layout: { padding: 8 }
+      }
     });
   }
 
@@ -23,7 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
         labels: segLabels,
         datasets: [{ label: 'CA moyen (€)', data: segCAMoyen }]
       },
-      options: { responsive: true, plugins: { legend: { display: false } } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        layout: { padding: 8 }
+      }
     });
   }
 
@@ -42,16 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,      // <-- ajouté
         indexAxis: 'y',
         plugins: { legend: { display: false } },
+        layout: { padding: 8 },          // <-- cohérence
         scales: {
           x: {
             beginAtZero: true,
-            // ticks: { color: '#ffffff' },
             title: { display: true, text: 'Montant (€)' }
           },
           y: {
-            // ticks: { color: '#ffffff' },
             title: { display: true, text: 'Email' }
           }
         }
@@ -59,7 +69,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Graph 4 : Camembert CA par segment
+  const ctxPie = document.getElementById('segmentPieChart');
+  if (ctxPie) {
+    new Chart(ctxPie, {
+      type: 'pie',
+      data: {
+        labels: segmentLabels,
+        datasets: [{
+          label: 'CA total (€)',
+          data: segmentCA,
+          backgroundColor: ['#3D1FE6', '#1A0D99', '#6C5CE7', '#A29BFE'],
+          borderColor: '#ffffff',
+          borderWidth: 0.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,      // <-- ajouté
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: '#ffffff',          // <-- corrigé
+              font: { size: 14 }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                return `${label}: ${value.toFixed(2)} €`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 });
+
 function refreshData() {
   const overlay = document.getElementById("loadingOverlay");
   if (overlay) overlay.classList.add("active");
